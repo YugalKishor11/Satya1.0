@@ -1,0 +1,8 @@
+{
+  "name": "Satya 1.0 for Google Deepmind Hackathon",
+  "description": "A multi-agent AI system for misinformation detection, verification, and correction using Google Gemini models.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
