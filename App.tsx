@@ -36,6 +36,30 @@ const initialContentState: AppContentState = {
   error: null,
 };
 
+// Agent Configuration
+const agentMessages = {
+  scout: {
+    description: "Scrapes trusted real-time web sources. Filters noise to fetch raw context for verification.",
+    loading: ["Scanning image pixels...", "Extracting text layers...", "Identifying core claims...", "Scanning context..."],
+    completed: "Claim extracted successfully."
+  },
+  verifier: {
+    description: "Cross-references claims against evidence using Chain-of-Thought reasoning to detect fallacies.",
+    loading: ["Cross-referencing sources...", "Detecting logical fallacies...", "Querying trusted domains...", "Calculating truth probability..."],
+    completed: "Verification complete."
+  },
+  explainer: {
+    description: "Distills complex data into a clear \"True/False\" verdict with cited sources and confidence scores.",
+    loading: ["Synthesizing evidence...", "Drafting explanation...", "Formatting citations...", "Generating readability score..."],
+    completed: "Report generated."
+  },
+  counter: {
+    description: "Drafts empathetic, fact-based corrections optimized for social platforms to stop spread.",
+    loading: ["Analyzing sentiment...", "Drafting polite correction...", "Optimizing for social media...", "Finalizing counter-message..."],
+    completed: "Message ready."
+  }
+};
+
 interface MainAppProps {
   onBack: () => void;
   initialTab?: 'stream' | 'research';
@@ -305,6 +329,15 @@ const MainApp: React.FC<MainAppProps> = ({ onBack, initialTab = 'stream' }) => {
     
     setShowHistory(false);
     setActiveTab('stream');
+  };
+
+  const getProgress = () => {
+    if (report) return 100;
+    if (status.counter === AgentState.WORKING) return 85;
+    if (status.explainer === AgentState.WORKING) return 60;
+    if (status.verifier === AgentState.WORKING) return 35;
+    if (status.scout === AgentState.WORKING) return 10;
+    return 0;
   };
 
   const hasStarted = status.scout !== AgentState.IDLE;
@@ -607,6 +640,60 @@ const MainApp: React.FC<MainAppProps> = ({ onBack, initialTab = 'stream' }) => {
                     </div>
                 )}
               </div>
+            )}
+            
+            {/* Active Pipeline Visualization */}
+            {hasStarted && !report && (
+               <div className="w-full max-w-6xl mt-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                  {/* Progress Bar */}
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-mono">
+                      <span>Pipeline Progress</span>
+                      <span>{getProgress()}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 dark:bg-navy-800 rounded-full mb-10 overflow-hidden">
+                     <div 
+                       className="h-full bg-brand-blue transition-all duration-700 ease-out relative"
+                       style={{ width: `${getProgress()}%` }}
+                     >
+                        <div className="absolute inset-0 bg-white/20 animate-[loading-bar_1s_infinite_linear]"></div>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                     <AgentCard 
+                        name="Scout" 
+                        role="Retrieval" 
+                        state={status.scout} 
+                        description={agentMessages.scout.description}
+                        loadingMessages={agentMessages.scout.loading}
+                        completionMessage={agentMessages.scout.completed}
+                     />
+                     <AgentCard 
+                        name="Verifier" 
+                        role="Logic" 
+                        state={status.verifier} 
+                        description={agentMessages.verifier.description}
+                        loadingMessages={agentMessages.verifier.loading}
+                        completionMessage={agentMessages.verifier.completed}
+                     />
+                     <AgentCard 
+                        name="Synthesis" 
+                        role="Verdict" 
+                        state={status.explainer} 
+                        description={agentMessages.explainer.description}
+                        loadingMessages={agentMessages.explainer.loading}
+                        completionMessage={agentMessages.explainer.completed}
+                     />
+                     <AgentCard 
+                        name="ReplyBot" 
+                        role="Action" 
+                        state={status.counter} 
+                        description={agentMessages.counter.description}
+                        loadingMessages={agentMessages.counter.loading}
+                        completionMessage={agentMessages.counter.completed}
+                     />
+                  </div>
+               </div>
             )}
 
             {/* Final Report */}

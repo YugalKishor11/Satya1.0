@@ -7,6 +7,7 @@ interface AgentCardProps {
   state: AgentState;
   description: string;
   loadingMessages?: string[];
+  completionMessage?: string;
 }
 
 const AgentCard: React.FC<AgentCardProps> = ({ 
@@ -14,7 +15,8 @@ const AgentCard: React.FC<AgentCardProps> = ({
   role, 
   state, 
   description,
-  loadingMessages = ["Processing...", "Analyzing data...", "Thinking..."] 
+  loadingMessages = ["Processing...", "Analyzing data...", "Thinking..."],
+  completionMessage
 }) => {
   const [displayedText, setDisplayedText] = useState("");
 
@@ -119,9 +121,9 @@ const AgentCard: React.FC<AgentCardProps> = ({
   return (
     <div 
       className={`
-        relative overflow-hidden rounded-[24px] flex flex-col h-full
+        relative overflow-hidden rounded-[24px] flex flex-col h-full min-h-[220px]
         transition-all duration-500 ease-out group isolate
-        ${isActive ? 'scale-[1.02] -translate-y-3' : 'hover:-translate-y-2'}
+        ${isActive ? 'scale-[1.02] -translate-y-3 z-10' : isCompleted ? 'opacity-80 hover:opacity-100 hover:-translate-y-1' : 'opacity-60 grayscale-[0.5]'}
         bg-[#0f172a] dark:bg-[#020617]
       `}
       style={{
@@ -133,7 +135,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
     >
       
       {/* 1. Visual Header (Top) */}
-      <div className={`h-32 w-full relative overflow-hidden bg-gradient-to-br ${theme.gradient}`}>
+      <div className={`h-28 w-full relative overflow-hidden bg-gradient-to-br ${theme.gradient}`}>
          
          {/* Grid Background Effect when Active */}
          {isActive && (
@@ -197,24 +199,24 @@ const AgentCard: React.FC<AgentCardProps> = ({
       <div className="p-6 pt-2 flex-1 flex flex-col relative z-10">
          
          <div className="mb-auto">
-            <h3 className="text-2xl font-bold text-white mb-3 tracking-tight flex items-center gap-2 drop-shadow-sm">
+            <h3 className="text-xl font-bold text-white mb-2 tracking-tight flex items-center gap-2 drop-shadow-sm">
                 {name}
             </h3>
             
-            <div className="relative min-h-[80px]">
+            <div className="relative min-h-[60px]">
                 {/* Animated Loading Text with Typewriter Effect */}
                 <div className={`transition-all duration-300 absolute inset-0 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-                     <p className="font-mono text-sm leading-relaxed" style={{ color: theme.secondary }}>
-                       <span className="opacity-70 mr-2 text-xs">{'>'}</span>
+                     <p className="font-mono text-xs leading-relaxed" style={{ color: theme.secondary }}>
+                       <span className="opacity-70 mr-2 text-[10px]">{'>'}</span>
                        {displayedText}
-                       <span className="animate-pulse ml-1 inline-block w-2 h-4 align-middle bg-current opacity-70"></span>
+                       <span className="animate-pulse ml-1 inline-block w-1.5 h-3 align-middle bg-current opacity-70"></span>
                      </p>
                 </div>
 
-                {/* Static Description Text */}
+                {/* Static Description Text (Shows when IDLE, COMPLETED, or ERROR) */}
                 <div className={`transition-all duration-300 ${isActive ? 'opacity-0 -translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
-                    <p className="text-slate-400 text-sm leading-relaxed font-normal">
-                        {description}
+                    <p className={`text-xs leading-relaxed font-normal ${isCompleted ? 'text-emerald-400 font-medium' : 'text-slate-400'}`}>
+                        {isCompleted && completionMessage ? completionMessage : description}
                     </p>
                 </div>
             </div>
