@@ -1,8 +1,9 @@
 {
-  "name": "Satya 1.0 for Google Deepmind Hackathon",
-  "description": "A multi-agent AI system for misinformation detection, verification, and correction using Google Gemini models.",
+  "name": "Satya 1.0 - AI Misinformation Verifier",
+  "description": "An autonomous multi-agent AI verification system designed to detect, verify, and counter misinformation in real time.",
   "requestFramePermissions": [
     "microphone",
     "camera"
-  ]
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
